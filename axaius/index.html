@@ -666,6 +666,13 @@
             window.setInterval(refreshSharedProgress, SUPABASE_POLL_INTERVAL);
         });
 
+        function isSupabaseConfigured() {
+            return USE_PROTECTED_API || (
+                SUPABASE_URL.startsWith('https://') &&
+                SUPABASE_ANON_KEY.length > 0
+            );
+        }
+
         function setSyncStatus(message, tone = 'success') {
             const status = document.getElementById('syncStatus');
             status.textContent = message;
