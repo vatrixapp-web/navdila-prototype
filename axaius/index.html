@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AXAIUS — Brand Engine & Interactive Checklist | Glala Studios</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f4ff',
+                            100: '#e0e9fe',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            900: '#1e3a8a',
+                            cyan: '#06b6d4',
+                            emerald: '#10b981',
+                        },
+                        dark: {
+                            bg: '#090d16',
+                            card: '#111827',
+                            border: '#1f293d',
+                            hover: '#1a2436',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #090d16; }
+        ::-webkit-scrollbar-thumb { background: #1f293d; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #374151; }
+
+        /* PiP Drag Handle Styling */
+        .pip-window {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-dark-bg text-slate-100 font-sans antialiased min-h-screen flex flex-col selection:bg-brand-500 selection:text-white">
+
+    <!-- TOP NAVIGATION BAR -->
+    <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md border-b border-dark-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Brand Identity -->
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-600 via-brand-cyan to-brand-emerald flex items-center justify-center font-bold text-white shadow-lg shadow-brand-500/20">
+                    AX
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span class="font-extrabold tracking-tight text-xl text-white">AXAIUS</span>
+                        <span class="text-xs px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-cyan border border-brand-500/20 font-mono">v1.0 Ready</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400 font-medium tracking-wide uppercase">Developed by <span class="text-slate-200">Glala Studios</span></p>
+                </div>
+            </div>
+
+            <!-- Global Search & Stats -->
+            <div class="hidden md:flex items-center space-x-6">
+                <!-- Search Bar -->
+                <div class="relative w-64">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" id="searchInput" onkeyup="filterChecklist()" placeholder="Search deliverables..."
+                        class="w-full bg-dark-card border border-dark-border rounded-lg pl-9 pr-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-brand-500 transition-colors">
+                </div>
+
+                <!-- Global Readiness Progress -->
+                <div class="flex items-center space-x-3 bg-dark-card border border-dark-border px-3 py-1.5 rounded-lg">
+                    <div class="text-right">
+                        <div class="text-[10px] text-slate-400 font-medium uppercase">Launch Readiness</div>
+                        <div class="text-xs font-mono font-bold text-brand-cyan" id="globalProgressText">0 / 0 (0%)</div>
+                    </div>
+                    <div class="w-16 bg-dark-border h-2 rounded-full overflow-hidden">
+                        <div id="globalProgressBar" class="bg-gradient-to-r from-brand-600 to-brand-cyan h-full w-0 transition-all duration-300"></div>
+                    </div>
+                </div>
+
+                <!-- PiP Popout Trigger Button -->
+                <button onclick="togglePipOverlay()" title="Toggle Floating Launch Widget"
+                    class="flex items-center space-x-2 bg-brand-600/10 hover:bg-brand-600/20 text-brand-cyan border border-brand-500/30 px-3 py-1.5 rounded-lg text-xs font-medium transition-all">
+                    <i data-lucide="picture-in-picture-2" class="w-4 h-4"></i>
+                    <span>Floating Widget</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO SECTION & BRAND MATRIX -->
+    <section class="border-b border-dark-border bg-gradient-to-b from-dark-card/50 to-dark-bg py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+                <!-- Left: Core Slogan & Positioning -->
+                <div class="lg:col-span-2 space-y-4">
+                    <div class="inline-flex items-center space-x-2 bg-brand-500/10 border border-brand-500/20 rounded-full px-3 py-1 text-xs text-brand-cyan font-mono">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                        <span>Master Brand Strategy & UI System</span>
+                    </div>
+                    <h1 class="text-3xl sm:text-4xl font-black text-white tracking-tight">
+                        AXAIUS <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-cyan via-brand-500 to-brand-emerald">— Always Ahead.</span>
+                    </h1>
+                    <p class="text-slate-300 text-sm leading-relaxed max-w-2xl">
+                        Standalone software brand developed by <strong class="text-white">Glala Studios</strong>. Engineered for immediate pharmacy operations &amp; regulatory compliance in Kenya (Nov 16 Pilot), architected to scale universally into wholesale, hardware, and general retail commerce.
+                    </p>
+
+                    <!-- Interactive Phase Filters -->
+                    <div class="flex flex-wrap gap-2 pt-2">
+                        <button onclick="filterPhase('all')" class="phase-btn active px-3 py-1 rounded-md text-xs font-medium bg-brand-600 text-white transition-all" data-phase="all">All Deliverables</button>
+                        <button onclick="filterPhase('1')" class="phase-btn px-3 py-1 rounded-md text-xs font-medium bg-dark-card border border-dark-border text-slate-300 hover:border-brand-500/50 transition-all" data-phase="1">Phase 1: Strategy</button>
+                        <button onclick="filterPhase('2')" class="phase-btn px-3 py-1 rounded-md text-xs font-medium bg-dark-card border border-dark-border text-slate-300 hover:border-brand-500/50 transition-all" data-phase="2">Phase 2: Core Identity</button>
+                        <button onclick="filterPhase('3')" class="phase-btn px-3 py-1 rounded-md text-xs font-medium bg-dark-card border border-dark-border text-slate-300 hover:border-brand-500/50 transition-all" data-phase="3">Phase 3: Product & UI</button>
+                        <button onclick="filterPhase('4')" class="phase-btn px-3 py-1 rounded-md text-xs font-medium bg-dark-card border border-dark-border text-slate-300 hover:border-brand-500/50 transition-all" data-phase="4">Phase 4: Market & Launch</button>
+                        <button onclick="filterPhase('5')" class="phase-btn px-3 py-1 rounded-md text-xs font-medium bg-dark-card border border-dark-border text-slate-300 hover:border-brand-500/50 transition-all" data-phase="5">Phase 5: Scale</button>
+                    </div>
+                </div>
+
+                <!-- Right: Quick Specs Card -->
+                <div class="bg-dark-card border border-dark-border rounded-xl p-5 space-y-3 relative overflow-hidden">
+                    <div class="absolute -right-6 -top-6 w-24 h-24 bg-brand-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+                    <div class="flex justify-between items-center border-b border-dark-border pb-2">
+                        <span class="text-xs font-mono text-slate-400 uppercase">Brand Profile</span>
+                        <span class="text-xs font-mono text-brand-cyan">Kenya / EA</span>
+                    </div>
+
+                    <div class="space-y-2 text-xs">
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Pronunciation:</span>
+                            <span class="font-mono text-slate-200">ak-SAY-us / ax-EYE-us</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Official Tagline:</span>
+                            <span class="font-semibold text-brand-cyan">"Always Ahead."</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Parent Entity:</span>
+                            <span class="text-slate-200">Glala Studios</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Pilot Rollout:</span>
+                            <span class="font-mono text-brand-emerald">Nov 16, 2026 (6 Chemists)</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Core Engine:</span>
+                            <span class="text-slate-200">Offline PWA / GS1 DataMatrix</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <!-- SYSTEM NAVIGATION TABS -->
+        <div class="border-b border-dark-border">
+            <nav class="flex space-x-6 overflow-x-auto pb-px" id="tabNav">
+                <button onclick="switchTab('checklist')" id="tabBtn-checklist" class="tab-btn active pb-3 text-sm font-medium border-b-2 border-brand-cyan text-brand-cyan flex items-center space-x-2">
+                    <i data-lucide="check-square" class="w-4 h-4"></i>
+                    <span>Master Deliverables Checklist</span>
+                </button>
+                <button onclick="switchTab('styleguide')" id="tabBtn-styleguide" class="tab-btn pb-3 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center space-x-2">
+                    <i data-lucide="palette" class="w-4 h-4"></i>
+                    <span>Brand Style Guide & Tokens</span>
+                </button>
+                <button onclick="switchTab('components')" id="tabBtn-components" class="tab-btn pb-3 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center space-x-2">
+                    <i data-lucide="layers" class="w-4 h-4"></i>
+                    <span>Product UI Design System</span>
+                </button>
+                <button onclick="switchTab('endorsed')" id="tabBtn-endorsed" class="tab-btn pb-3 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center space-x-2">
+                    <i data-lucide="shield-check" class="w-4 h-4"></i>
+                    <span>Glala Studios Attribution Rules</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- TAB 1: MASTER DELIVERABLES CHECKLIST -->
+        <div id="tabContent-checklist" class="space-y-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-dark-card border border-dark-border p-4 rounded-xl">
+                <div>
+                    <h2 class="text-base font-bold text-white">Deliverable Completion Hub</h2>
+                    <p class="text-xs text-slate-400">Click deliverables as you build. Data persists in browser storage.</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="resetChecklist()" class="px-3 py-1.5 text-xs bg-dark-border hover:bg-slate-700 text-slate-300 rounded-lg transition-colors">Reset Progress</button>
+                    <button onclick="exportChecklist()" class="px-3 py-1.5 text-xs bg-brand-600 hover:bg-brand-500 text-white rounded-lg transition-colors flex items-center space-x-1">
+                        <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                        <span>Export Status</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- CHECKLIST CATEGORIES CONTAINER -->
+            <div id="checklistCategoriesContainer" class="space-y-6">
+                <!-- Dynamically populated via JavaScript -->
+            </div>
+        </div>
+
+        <!-- TAB 2: BRAND STYLE GUIDE & TOKENS -->
+        <div id="tabContent-styleguide" class="hidden space-y-8">
+            <!-- Typography & Color System -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Typography -->
+                <div class="bg-dark-card border border-dark-border rounded-xl p-6 space-y-4">
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center space-x-2">
+                        <i data-lucide="type" class="w-4 h-4 text-brand-cyan"></i>
+                        <span>Typography Hierarchy</span>
+                    </h3>
+                    <div class="space-y-4 text-xs">
+                        <div class="border-b border-dark-border pb-3">
+                            <span class="text-slate-400 block mb-1">Display & Headings (Inter Bold)</span>
+                            <p class="text-2xl font-bold text-white tracking-tight">AXAIUS — Always Ahead.</p>
+                        </div>
+                        <div class="border-b border-dark-border pb-3">
+                            <span class="text-slate-400 block mb-1">Body Text (Inter Regular)</span>
+                            <p class="text-slate-300 leading-relaxed">Fast, offline-first inventory control and regulatory compliance engine designed for high-density retail counters.</p>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block mb-1">Data & Numerical Logs (JetBrains Mono)</span>
+                            <p class="font-mono text-brand-cyan">LOT-2026-09A • EXP: 2028-11-16 • QTY: 4,850 POS</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Color Palette System -->
+                <div class="bg-dark-card border border-dark-border rounded-xl p-6 space-y-4">
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center space-x-2">
+                        <i data-lucide="palette" class="w-4 h-4 text-brand-cyan"></i>
+                        <span>Primary Color Palette</span>
+                    </h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                        <div class="p-3 bg-dark-bg border border-dark-border rounded-lg space-y-2">
+                            <div class="w-full h-8 bg-dark-bg rounded border border-dark-border"></div>
+                            <div class="font-mono text-[10px] text-slate-300">#090D16</div>
+                            <div class="text-[10px] text-slate-400">Dark Surface</div>
+                        </div>
+                        <div class="p-3 bg-dark-bg border border-dark-border rounded-lg space-y-2">
+                            <div class="w-full h-8 bg-brand-600 rounded"></div>
+                            <div class="font-mono text-[10px] text-slate-300">#2563EB</div>
+                            <div class="text-[10px] text-slate-400">Brand Primary</div>
+                        </div>
+                        <div class="p-3 bg-dark-bg border border-dark-border rounded-lg space-y-2">
+                            <div class="w-full h-8 bg-brand-cyan rounded"></div>
+                            <div class="font-mono text-[10px] text-slate-300">#06B6D4</div>
+                            <div class="text-[10px] text-slate-400">Kinetic Cyan</div>
+                        </div>
+                        <div class="p-3 bg-dark-bg border border-dark-border rounded-lg space-y-2">
+                            <div class="w-full h-8 bg-brand-emerald rounded"></div>
+                            <div class="font-mono text-[10px] text-slate-300">#10B981</div>
+                            <div class="text-[10px] text-slate-400">Compliant State</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logo Variations & Usage Rules -->
+            <div class="bg-dark-card border border-dark-border rounded-xl p-6 space-y-4">
+                <h3 class="text-sm font-bold text-white uppercase tracking-wider">Logo System & Clear Space</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-dark-bg border border-dark-border p-6 rounded-lg text-center space-y-2">
+                        <span class="text-[10px] text-slate-400 uppercase font-mono">Primary Horizontal</span>
+                        <div class="text-2xl font-extrabold text-white tracking-wider">AXAIUS</div>
+                        <div class="text-[10px] text-brand-cyan font-mono tracking-widest uppercase">ALWAYS AHEAD</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg text-center space-y-2">
+                        <span class="text-[10px] text-slate-500 uppercase font-mono">Light Background Variant</span>
+                        <div class="text-2xl font-extrabold text-slate-900 tracking-wider">AXAIUS</div>
+                        <div class="text-[10px] text-brand-600 font-mono tracking-widest uppercase">ALWAYS AHEAD</div>
+                    </div>
+                    <div class="bg-dark-bg border border-dark-border p-6 rounded-lg text-center space-y-2">
+                        <span class="text-[10px] text-slate-400 uppercase font-mono">Endorsement Lockup</span>
+                        <div class="text-xl font-bold text-white">AXAIUS</div>
+                        <div class="text-[10px] text-slate-400">Developed by <span class="text-white font-semibold">Glala Studios</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: PRODUCT UI DESIGN SYSTEM -->
+        <div id="tabContent-components" class="hidden space-y-8">
+            <div class="bg-dark-card border border-dark-border rounded-xl p-6 space-y-6">
+                <div>
+                    <h3 class="text-base font-bold text-white">Interactive Component Library</h3>
+                    <p class="text-xs text-slate-400">Live preview of UI tokens engineered for the AXAIUS pharmacy and enterprise operations dashboard.</p>
+                </div>
+
+                <!-- UI Component Showcase Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                    <!-- Buttons & Triggers -->
+                    <div class="bg-dark-bg border border-dark-border p-4 rounded-lg space-y-3">
+                        <span class="text-xs font-mono text-slate-400">1. Action Buttons</span>
+                        <div class="flex flex-wrap gap-2">
+                            <button class="px-3 py-1.5 bg-brand-600 hover:bg-brand-500 text-white rounded-lg text-xs font-medium transition-colors">Primary Action</button>
+                            <button class="px-3 py-1.5 bg-dark-card border border-dark-border hover:border-slate-500 text-slate-200 rounded-lg text-xs font-medium transition-colors">Secondary</button>
+                            <button class="px-3 py-1.5 bg-brand-emerald/10 border border-brand-emerald/30 text-brand-emerald rounded-lg text-xs font-medium">Compliant</button>
+                        </div>
+                    </div>
+
+                    <!-- Status Badges & Alerts -->
+                    <div class="bg-dark-bg border border-dark-border p-4 rounded-lg space-y-3">
+                        <span class="text-xs font-mono text-slate-400">2. Status Badges</span>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-2.5 py-1 bg-brand-emerald/10 border border-brand-emerald/30 text-brand-emerald rounded-full text-[10px] font-mono flex items-center space-x-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-brand-emerald animate-pulse"></span>
+                                <span>PPB READY</span>
+                            </span>
+                            <span class="px-2.5 py-1 bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 rounded-full text-[10px] font-mono">
+                                LOW STOCK (12 REAM)
+                            </span>
+                            <span class="px-2.5 py-1 bg-red-500/10 border border-red-500/30 text-red-400 rounded-full text-[10px] font-mono">
+                                TEMP EXCEEDED (8.4°C)
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Input Fields -->
+                    <div class="bg-dark-bg border border-dark-border p-4 rounded-lg space-y-3">
+                        <span class="text-xs font-mono text-slate-400">3. GS1 Scanner Input Field</span>
+                        <div class="relative">
+                            <input type="text" readonly value="(01)06164005000018(17)261116(10)LOT-9921"
+                                class="w-full bg-dark-card border border-brand-cyan/50 rounded-lg px-3 py-1.5 text-xs font-mono text-brand-cyan focus:outline-none">
+                            <i data-lucide="scan-line" class="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-brand-cyan"></i>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Live Operational Table Example -->
+                <div class="space-y-3 pt-4 border-t border-dark-border">
+                    <span class="text-xs font-mono text-slate-400">4. High-Density Pharmacy Inventory Table</span>
+                    <div class="overflow-x-auto border border-dark-border rounded-lg">
+                        <table class="w-full text-left text-xs text-slate-300">
+                            <thead class="bg-dark-bg text-slate-400 uppercase font-mono text-[10px]">
+                                <tr>
+                                    <th class="p-3">Item Description</th>
+                                    <th class="p-3">Batch / Lot</th>
+                                    <th class="p-3">Expiry (FEFO)</th>
+                                    <th class="p-3">In Stock</th>
+                                    <th class="p-3">PPB Audit Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-dark-border bg-dark-card">
+                                <tr>
+                                    <td class="p-3 font-semibold text-white">Amoxicillin 500mg Caps</td>
+                                    <td class="p-3 font-mono">AMX-2026-09</td>
+                                    <td class="p-3 font-mono text-brand-cyan">2027-04-30</td>
+                                    <td class="p-3 font-mono">1,400 caps</td>
+                                    <td class="p-3"><span class="text-brand-emerald text-[10px] font-mono">● Verified</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-semibold text-white">Paracetamol 500mg Tabs</td>
+                                    <td class="p-3 font-mono">PAR-2026-11</td>
+                                    <td class="p-3 font-mono text-yellow-400">2026-12-15</td>
+                                    <td class="p-3 font-mono">850 tabs</td>
+                                    <td class="p-3"><span class="text-brand-emerald text-[10px] font-mono">● Verified</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- TAB 4: GLALA STUDIOS ENDORSEMENT RULES -->
+        <div id="tabContent-endorsed" class="hidden space-y-6">
+            <div class="bg-dark-card border border-dark-border rounded-xl p-6 space-y-6">
+                <div>
+                    <h3 class="text-base font-bold text-white">Parent Brand Relationship Architecture</h3>
+                    <p class="text-xs text-slate-400">Guidelines for positioning AXAIUS as a standalone product endorsed by Glala Studios.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+                    <!-- Approved Applications -->
+                    <div class="bg-dark-bg border border-brand-emerald/30 p-5 rounded-lg space-y-3">
+                        <div class="flex items-center space-x-2 text-brand-emerald font-bold uppercase tracking-wider">
+                            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                            <span>Where to Mention "Glala Studios"</span>
+                        </div>
+                        <ul class="space-y-2 text-slate-300 list-disc list-inside">
+                            <li><strong>Website Footer & About Page:</strong> "AXAIUS is developed and maintained by Glala Studios."</li>
+                            <li><strong>Investor Decks & B2B Proposals:</strong> Use the formal endorsement lockup (*AXAIUS — Developed by Glala Studios*).</li>
+                            <li><strong>Legal & Compliance Documents:</strong> Software licensing agreements, contracts, and county permit forms.</li>
+                            <li><strong>Official Launch Announcements:</strong> PR releases and press notes.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Prohibited Applications -->
+                    <div class="bg-dark-bg border border-red-500/30 p-5 rounded-lg space-y-3">
+                        <div class="flex items-center space-x-2 text-red-400 font-bold uppercase tracking-wider">
+                            <i data-lucide="x-circle" class="w-4 h-4"></i>
+                            <span>Where AXAIUS Stands Alone</span>
+                        </div>
+                        <ul class="space-y-2 text-slate-300 list-disc list-inside">
+                            <li><strong>Daily Pharmacy Counter Interface:</strong> Keep UI header clean with just "AXAIUS Health".</li>
+                            <li><strong>App Icons & Favicons:</strong> Use standalone AXAIUS emblem only.</li>
+                            <li><strong>Hardware Decals & Stickers:</strong> "Powered by AXAIUS — Always Ahead."</li>
+                            <li><strong>Routine Notifications:</strong> System emails and WhatsApp alerts.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FLOATING PIP WIDGET CONTAINER (Controlled by JavaScript) -->
+    <div id="floatingWidget" class="fixed bottom-6 right-6 z-50 w-72 bg-dark-card/95 border border-brand-500/40 rounded-xl p-4 pip-window space-y-3 transition-all">
+        <div class="flex items-center justify-between border-b border-dark-border pb-2">
+            <div class="flex items-center space-x-2">
+                <span class="w-2 h-2 rounded-full bg-brand-cyan animate-pulse"></span>
+                <span class="text-xs font-bold text-white font-mono">AXAIUS Pilot Tracker</span>
+            </div>
+            <button onclick="togglePipOverlay()" class="text-slate-400 hover:text-white text-xs">✕</button>
+        </div>
+
+        <div class="space-y-2 text-xs">
+            <div class="flex justify-between">
+                <span class="text-slate-400">Target Launch:</span>
+                <span class="font-mono text-brand-cyan">16 Nov 2026</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-slate-400">Pilot Pharmacies:</span>
+                <span class="font-mono text-slate-200">6 Locations</span>
+            </div>
+
+            <!-- Quick Progress Bar -->
+            <div class="space-y-1 pt-1">
+                <div class="flex justify-between text-[10px]">
+                    <span class="text-slate-400">Completion</span>
+                    <span id="pipProgressText" class="text-brand-emerald font-mono">0%</span>
+                </div>
+                <div class="w-full bg-dark-border h-1.5 rounded-full overflow-hidden">
+                    <div id="pipProgressBar" class="bg-brand-emerald h-full w-0 transition-all duration-300"></div>
+                </div>
+            </div>
+        </div>
+
+        <button onclick="switchTab('checklist')" class="w-full py-1.5 bg-brand-600 hover:bg-brand-500 text-white rounded text-[11px] font-medium transition-colors">
+            Open Master Checklist
+        </button>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-dark-border bg-dark-card py-6 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+            <div>
+                <span class="font-bold text-slate-200">AXAIUS</span> — Always Ahead.
+            </div>
+            <div>
+                Developed & Engineered by <a href="#" class="text-brand-cyan hover:underline">Glala Studios</a> • Kenya
+            </div>
+        </div>
+    </footer>
+
+    <!-- INTERACTIVE JAVASCRIPT ENGINE -->
+    <script>
+        // MASTER DELIVERABLES DATA MATRIX (All 26 Categories Structured into 5 Phases)
+        const MASTER_DELIVERABLES = [
+            // PHASE 1: STRATEGY & VERBAL
+            {
+                id: 'cat-1',
+                phase: '1',
+                title: '01. Brand Strategy',
+                icon: 'compass',
+                items: [
+                    'Strategic foundation document', 'Brand purpose & long-term vision', 'Mission statement',
+                    'Brand values & principles', 'Brand positioning matrix', 'Value proposition statements',
+                    'Target audience profiles (Kenyan Chemists & SMEs)', 'Customer pain points breakdown',
+                    'Competitive analysis', 'Brand archetype & personality', 'Parent brand relationship model'
+                ]
+            },
+            {
+                id: 'cat-2',
+                phase: '1',
+                title: '02. Verbal Identity',
+                icon: 'message-square',
+                items: [
+                    'Official brand name specification (AXAIUS)', 'Tagline lockup ("Always Ahead.")',
+                    'Elevator pitch & one-line descriptions', 'Tone of voice guidelines',
+                    'Product terminology dictionary', 'Standardized Call-to-Action library',
+                    'Words-to-avoid list', 'Customer communication templates'
+                ]
+            },
+
+            // PHASE 2: CORE VISUAL IDENTITY
+            {
+                id: 'cat-3',
+                phase: '2',
+                title: '03. Logo System',
+                icon: 'box',
+                items: [
+                    'Primary AXAIUS wordmark', 'Secondary compact logo', 'Standalone brandmark / symbol',
+                    'Stacked and horizontal layouts', 'Monochrome & dark/light background variants',
+                    'Minimum size & clear-space specifications', 'App icon & browser favicon suite'
+                ]
+            },
+            {
+                id: 'cat-4',
+                phase: '2',
+                title: '04. Color Identity System',
+                icon: 'palette',
+                items: [
+                    'Primary brand palette (Deep Tech & Kinetic Blue/Cyan)', 'Secondary & accent colors',
+                    'Light & dark mode interface tokens', 'Semantic UI colors (Compliant, Warning, Alert)',
+                    'Accessibility & contrast validation (WCAG AA)'
+                ]
+            },
+            {
+                id: 'cat-5',
+                phase: '2',
+                title: '05. Typography System',
+                icon: 'type',
+                items: [
+                    'Primary typeface rules (Inter)', 'Data & numerical font rules (JetBrains Mono)',
+                    'Type scale & line-height rules', 'Responsive font size guidelines'
+                ]
+            },
+            {
+                id: 'cat-6',
+                phase: '2',
+                title: '06. Graphic Language & Visuals',
+                icon: 'layout-grid',
+                items: [
+                    'Core graphic motif & geometry', 'Iconography guidelines & icon set',
+                    'Data visualization style guide', 'Diagram & flow chart styling'
+                ]
+            },
+
+            // PHASE 3: PRODUCT UI & DESIGN SYSTEM
+            {
+                id: 'cat-12',
+                phase: '3',
+                title: '12. Product UI/UX & Design System',
+                icon: 'layers',
+                items: [
+                    'User journey mapping & flows', 'Design tokens (Color, Typography, Spacing)',
+                    'UI Component library (Buttons, Inputs, Modals, Tables)',
+                    'Pharmacy specific patterns (GS1 Scanner, FEFO display, Expiry alerts)',
+                    'Interface state rules (Default, Hover, Active, Offline)', 'Figma design library master file'
+                ]
+            },
+            {
+                id: 'cat-13',
+                phase: '3',
+                title: '13. Specialized Product Iconography & Data Vis',
+                icon: 'bar-chart-3',
+                items: [
+                    'Domain-specific icon library (PPB, Stock, Temp)', 'Status alert icon indicators',
+                    'Chart & analytics visual standards', 'Table data formatting standards'
+                ]
+            },
+            {
+                id: 'cat-',
+                phase: '3',
+                title: '14. Parent-Brand Relationship (Glala Studios)',
+                icon: 'shield-check',
+                items: [
+                    'Brand relationship rules document', 'Approved "Developed by Glala Studios" lockup',
+                    'Co-branding rules for corporate decks', 'Distinct identity separation guidelines'
+                ]
+            },
+
+            // PHASE 4: MARKET PRESENCE & LAUNCH
+            {
+                id: 'cat-10',
+                phase: '4',
+                title: '10 & 11. Marketing Site & Digital Presence',
+                icon: 'globe',
+                items: [
+                    'Marketing website sitemap & content structure', 'Homepage design & interactive ROI demo',
+                    'Industry landing pages (Pharmacy, Wholesale)', 'Social media template suite',
+                    'Branded email signature & document templates', 'Pilot onboarding welcome pack'
+                ]
+            },
+            {
+                id: 'cat-15',
+                phase: '4',
+                title: '15. Corporate & Sales Collateral',
+                icon: 'file-text',
+                items: [
+                    'Pitch deck template (10-12 slides)', 'Product one-pager PDF',
+                    'Guided demo presentation deck', 'AXAIUS-branded business cards & proposal headers'
+                ]
+            },
+            {
+                id: 'cat-19',
+                phase: '4',
+                title: '19. Customer Onboarding & Communication',
+                icon: 'user-check',
+                items: [
+                    'In-app onboarding flow', 'Welcome & setup automated emails',
+                    'Help center visual theme', 'WhatsApp notification templates'
+                ]
+            },
+
+            // PHASE 5: EXPANSION & ADVANCED
+            {
+                id: 'cat-8',
+                phase: '5',
+                title: '08 & 09. Motion & Sonic Identity',
+                icon: 'video',
+                items: [
+                    'Animated logo reveal', 'UI micro-interaction animation rules',
+                    'Feature explainer video graphics', 'Optional sonic logo signature'
+                ]
+            },
+            {
+                id: 'cat-20',
+                phase: '5',
+                title: '20 & 21. Governance & Master Documentation',
+                icon: 'book-open',
+                items: [
+                    'Consolidated AXAIUS Brand Guidelines (Brand Book)', 'Asset folder structure setup',
+                    'Trademark & legal naming compliance audit', 'Brand asset index master list'
+                ]
+            }
+        ];
+
+        // LOCAL STORAGE STATE MANAGEMENT
+        let completedItems = JSON.parse(localStorage.getItem('axaius_completed_deliverables')) || {};
+
+        // INITIALIZATION
+        document.addEventListener('DOMContentLoaded', () => {
+            renderChecklist();
+            updateProgressCounters();
+            lucide.createIcons();
+        });
+
+        // RENDER CHECKLIST CATEGORIES & ITEMS
+        function renderChecklist(filterPhaseVal = 'all', searchQuery = '') {
+            const container = document.getElementById('checklistCategoriesContainer');
+            container.innerHTML = '';
+
+            MASTER_DELIVERABLES.forEach(cat => {
+                // Phase filter check
+                if (filterPhaseVal !== 'all' && cat.phase !== filterPhaseVal) return;
+
+                // Search query filter check
+                const matchingItems = cat.items.filter(item =>
+                    item.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    cat.title.toLowerCase().includes(searchQuery.toLowerCase())
+                );
+
+                if (searchQuery && matchingItems.length === 0) return;
+
+                // Category Card Element
+                const catCard = document.createElement('div');
+                catCard.className = 'bg-dark-card border border-dark-border rounded-xl p-5 space-y-4';
+                catCard.setAttribute('data-phase', cat.phase);
+
+                // Calculate Category Progress
+                const totalInCat = cat.items.length;
+                const completedInCat = cat.items.filter(item => completedItems[`${cat.id}-${item}`]).length;
+                const catPercent = Math.round((completedInCat / totalInCat) * 100);
+
+                catCard.innerHTML = `
+                    <div class="flex items-center justify-between border-b border-dark-border pb-3">
+                        <div class="flex items-center space-x-3">
+                            <div class="p-2 bg-brand-500/10 text-brand-cyan rounded-lg">
+                                <i data-lucide="${cat.icon}" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-white">${cat.title}</h3>
+                                <span class="text-[10px] text-slate-400 font-mono">Phase ${cat.phase}</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs font-mono font-bold text-brand-cyan">${completedInCat}/${totalInCat}</span>
+                            <span class="text-[10px] text-slate-400 block">${catPercent}%</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        ${cat.items.map(item => {
+                            const itemId = `${cat.id}-${item}`;
+                            const isChecked = !!completedItems[itemId];
+                            return `
+                                <label class="flex items-start space-x-2.5 p-2 rounded-lg bg-dark-bg/60 border border-dark-border/50 hover:border-slate-700 cursor-pointer transition-colors text-xs">
+                                    <input type="checkbox" onchange="toggleItem('${itemId}')" ${isChecked ? 'checked' : ''}
+                                        class="mt-0.5 rounded border-dark-border bg-dark-card text-brand-600 focus:ring-brand-500 focus:ring-offset-dark-bg">
+                                    <span class="${isChecked ? 'line-through text-slate-500' : 'text-slate-300'}">${item}</span>
+                                </label>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+
+                container.appendChild(catCard);
+            });
+
+            lucide.createIcons();
+        }
+
+        // TOGGLE CHECKBOX ITEM
+        function toggleItem(itemId) {
+            completedItems[itemId] = !completedItems[itemId];
+            if (!completedItems[itemId]) delete completedItems[itemId];
+
+            localStorage.setItem('axaius_completed_deliverables', JSON.stringify(completedItems));
+            updateProgressCounters();
+
+            // Re-render text styling without full collapse
+            const checkbox = event.target;
+            const textSpan = checkbox.nextElementSibling;
+            if (checkbox.checked) {
+                textSpan.classList.add('line-through', 'text-slate-500');
+                textSpan.classList.remove('text-slate-300');
+            } else {
+                textSpan.classList.remove('line-through', 'text-slate-500');
+                textSpan.classList.add('text-slate-300');
+            }
+        }
+
+        // UPDATE GLOBAL & PIP PROGRESS COUNTERS
+        function updateProgressCounters() {
+            let totalItemsCount = 0;
+            MASTER_DELIVERABLES.forEach(cat => totalItemsCount += cat.items.length);
+
+            const completedCount = Object.keys(completedItems).length;
+            const percent = Math.round((completedCount / totalItemsCount) * 100);
+
+            // Update Header Counter
+            document.getElementById('globalProgressText').innerText = `${completedCount} / ${totalItemsCount} (${percent}%)`;
+            document.getElementById('globalProgressBar').style.width = `${percent}%`;
+
+            // Update PiP Counter
+            document.getElementById('pipProgressText').innerText = `${percent}%`;
+            document.getElementById('pipProgressBar').style.width = `${percent}%`;
+        }
+
+        // FILTER BY PHASE
+        function filterPhase(phaseVal) {
+            document.querySelectorAll('.phase-btn').forEach(btn => {
+                if (btn.getAttribute('data-phase') === phaseVal) {
+                    btn.classList.add('bg-brand-600', 'text-white');
+                    btn.classList.remove('bg-dark-card', 'text-slate-300');
+                } else {
+                    btn.classList.remove('bg-brand-600', 'text-white');
+                    btn.classList.add('bg-dark-card', 'text-slate-300');
+                }
+            });
+
+            const searchVal = document.getElementById('searchInput').value;
+            renderChecklist(phaseVal, searchVal);
+        }
+
+        // FILTER BY SEARCH
+        function filterChecklist() {
+            const searchVal = document.getElementById('searchInput').value;
+            const activePhaseBtn = document.querySelector('.phase-btn.bg-brand-600');
+            const phaseVal = activePhaseBtn ? activePhaseBtn.getAttribute('data-phase') : 'all';
+            renderChecklist(phaseVal, searchVal);
+        }
+
+        // TAB SWITCHER
+        function switchTab(tabId) {
+            ['checklist', 'styleguide', 'components', 'endorsed'].forEach(id => {
+                const btn = document.getElementById(`tabBtn-${id}`);
+                const content = document.getElementById(`tabContent-${id}`);
+
+                if (id === tabId) {
+                    btn.classList.add('border-brand-cyan', 'text-brand-cyan');
+                    btn.classList.remove('border-transparent', 'text-slate-400');
+                    content.classList.remove('hidden');
+                } else {
+                    btn.classList.remove('border-brand-cyan', 'text-brand-cyan');
+                    btn.classList.add('border-transparent', 'text-slate-400');
+                    content.classList.add('hidden');
+                }
+            });
+        }
+
+        // FLOATING PIP WIDGET TOGGLE
+        function togglePipOverlay() {
+            const widget = document.getElementById('floatingWidget');
+            widget.classList.toggle('hidden');
+        }
+
+        // RESET CHECKLIST
+        function resetChecklist() {
+            if (confirm('Are you sure you want to reset all deliverable progress?')) {
+                completedItems = {};
+                localStorage.removeItem('axaius_completed_deliverables');
+                renderChecklist();
+                updateProgressCounters();
+            }
+        }
+
+        // EXPORT CHECKLIST JSON
+        function exportChecklist() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(completedItems, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `AXAIUS_Brand_Readiness_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+    </script>
+</body>
+</html>

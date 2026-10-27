@@ -15,3 +15,9 @@ The included GitHub Actions workflow publishes the site from the repository root
 3. The workflow deploys on pushes to `main`. Share the Pages URL shown in the repository's Pages settings.
 
 The Share button uses the device's native share sheet where available, otherwise it copies the current URL. The URL becomes shareable once the site is published.
+
+## AXAIUS standalone page
+
+The AXAIUS brand engine and interactive checklist is kept separate from the Navdila prototype in `axaius/index.html`. After the next deployment to GitHub Pages, share it directly at:
+
+https://vatrixapp-web.github.io/navdila-prototype/axaius/
