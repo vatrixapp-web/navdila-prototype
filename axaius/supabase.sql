@@ -34,6 +34,7 @@ drop policy if exists "Signed-in users can update AXAIUS deliverables"
     on public.axaius_deliverables;
 
 revoke all on public.axaius_deliverables from public;
+grant usage on schema public to anon, authenticated;
 grant select, insert, update on public.axaius_deliverables to anon, authenticated;
 
 create policy "Public can read AXAIUS deliverables"
@@ -54,3 +55,8 @@ create policy "Public can update AXAIUS deliverables"
     to anon, authenticated
     using (true)
     with check (true);
+
+select
+    has_table_privilege('anon', 'public.axaius_deliverables', 'select') as anon_can_read,
+    has_table_privilege('anon', 'public.axaius_deliverables', 'insert') as anon_can_add,
+    has_table_privilege('anon', 'public.axaius_deliverables', 'update') as anon_can_update;
