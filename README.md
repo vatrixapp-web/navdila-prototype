@@ -21,3 +21,13 @@ The Share button uses the device's native share sheet where available, otherwise
 The AXAIUS brand engine and interactive checklist is kept separate from the Navdila prototype in `axaius/index.html`. After the next deployment to GitHub Pages, share it directly at:
 
 https://vatrixapp-web.github.io/navdila-prototype/axaius/
+
+### Enable shared checklist progress
+
+The AXAIUS checklist uses Supabase so changes sync between visitors. Before enabling it:
+
+1. Create a Supabase project and run [`axaius/supabase.sql`](./axaius/supabase.sql) in its SQL Editor.
+2. Copy the project URL and its **publishable** (or legacy `anon`) key into `AXAIUS_SUPABASE_URL` and `AXAIUS_SUPABASE_ANON_KEY` in [`axaius/config.js`](./axaius/config.js).
+3. Commit and push the changes to `main`; GitHub Pages will deploy the shared checklist.
+
+The configured page allows anyone with the link to view and edit checklist progress. Only use the publishable/anon key in `config.js`—never put a Supabase `service_role` or secret key in this public site. Until configured, checklist editing remains disabled so ticks cannot appear to save without syncing.
