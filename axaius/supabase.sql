@@ -1,4 +1,4 @@
-create table public.axaius_deliverables (
+create table if not exists public.axaius_deliverables (
     id text primary key,
     completed boolean not null default false,
     updated_at timestamptz not null default now()
@@ -6,21 +6,42 @@ create table public.axaius_deliverables (
 
 alter table public.axaius_deliverables enable row level security;
 
-create policy "Anyone can read AXAIUS deliverables"
+drop policy if exists "Anyone can read AXAIUS deliverables"
+    on public.axaius_deliverables;
+
+drop policy if exists "Anyone can add AXAIUS deliverables"
+    on public.axaius_deliverables;
+
+drop policy if exists "Anyone can update AXAIUS deliverables"
+    on public.axaius_deliverables;
+
+drop policy if exists "Signed-in users can read AXAIUS deliverables"
+    on public.axaius_deliverables;
+
+drop policy if exists "Signed-in users can add AXAIUS deliverables"
+    on public.axaius_deliverables;
+
+drop policy if exists "Signed-in users can update AXAIUS deliverables"
+    on public.axaius_deliverables;
+
+revoke all on public.axaius_deliverables from public, anon;
+grant select, insert, update on public.axaius_deliverables to authenticated;
+
+create policy "Signed-in users can read AXAIUS deliverables"
     on public.axaius_deliverables
     for select
-    to anon
+    to authenticated
     using (true);
 
-create policy "Anyone can add AXAIUS deliverables"
+create policy "Signed-in users can add AXAIUS deliverables"
     on public.axaius_deliverables
     for insert
-    to anon
+    to authenticated
     with check (true);
 
-create policy "Anyone can update AXAIUS deliverables"
+create policy "Signed-in users can update AXAIUS deliverables"
     on public.axaius_deliverables
     for update
-    to anon
+    to authenticated
     using (true)
     with check (true);

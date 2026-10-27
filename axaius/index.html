@@ -472,8 +472,6 @@
         </div>
     </footer>
 
-    <script src="./config.js"></script>
-
     <!-- INTERACTIVE JAVASCRIPT ENGINE -->
     <script>
         // MASTER DELIVERABLES DATA MATRIX (All 26 Categories Structured into 5 Phases)
@@ -638,8 +636,6 @@
             }
         ];
 
-        const SUPABASE_URL = window.AXAIUS_SUPABASE_URL || '';
-        const SUPABASE_ANON_KEY = window.AXAIUS_SUPABASE_ANON_KEY || '';
         const SUPABASE_TABLE = 'axaius_deliverables';
         const SUPABASE_POLL_INTERVAL = 5000;
         const deliverableIds = new Set(
@@ -660,21 +656,10 @@
             lucide.createIcons();
             updateSyncControls();
 
-            if (!isSupabaseConfigured()) {
-                setSyncStatus('Shared sync is not configured. Add the Supabase project URL and publishable key in axaius/config.js.', 'warning');
-                return;
-            }
-
             setSyncStatus('Connecting to shared checklist...', 'warning');
             refreshSharedProgress();
             window.setInterval(refreshSharedProgress, SUPABASE_POLL_INTERVAL);
         });
-
-        function isSupabaseConfigured() {
-            return SUPABASE_URL.startsWith('https://') &&
-                SUPABASE_ANON_KEY.length > 0 &&
-                !SUPABASE_ANON_KEY.includes('YOUR_');
-        }
 
         function setSyncStatus(message, tone = 'success') {
             const status = document.getElementById('syncStatus');
@@ -693,18 +678,12 @@
         }
 
         async function supabaseRequest(path, options = {}) {
-            const headers = {
-                apikey: SUPABASE_ANON_KEY,
-                'Content-Type': 'application/json',
-                ...(options.prefer ? { Prefer: options.prefer } : {})
-            };
-            if (!SUPABASE_ANON_KEY.startsWith('sb_publishable_')) {
-                headers.Authorization = `Bearer ${SUPABASE_ANON_KEY}`;
-            }
-
-            const response = await fetch(`${SUPABASE_URL.replace(/\/$/, '')}/rest/v1/${path}`, {
+            const response = await fetch(`/api/${path}`, {
                 method: options.method || 'GET',
-                headers,
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(options.prefer ? { Prefer: options.prefer } : {})
+                },
                 ...(options.body ? { body: JSON.stringify(options.body) } : {})
             });
 
