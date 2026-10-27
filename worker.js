@@ -6,6 +6,10 @@ export default {
     async fetch(request, env) {
         const url = new URL(request.url);
 
+        if (env.REQUIRE_AUTH === 'false') {
+            return env.ASSETS.fetch(request);
+        }
+
         if (!env.SUPABASE_URL || !env.SUPABASE_PUBLISHABLE_KEY) {
             return textResponse('Authentication is not configured.', 503);
         }
@@ -52,6 +56,15 @@ export default {
 
         if (url.pathname === `/api/${CHECKLIST_TABLE}`) {
             return proxyChecklistRequest(request, env, authenticated);
+        }
+
+        if (url.pathname === '/axaius/config.js') {
+            return new Response('window.AXAIUS_USE_PROTECTED_API = true;', {
+                headers: {
+                    'Content-Type': 'application/javascript; charset=utf-8',
+                    'Cache-Control': 'private, no-store'
+                }
+            });
         }
 
         const assetResponse = await env.ASSETS.fetch(request);

@@ -1,26 +1,27 @@
-# Navdila & AXAIUS private prototypes
+# Navdila & AXAIUS prototypes
 
 Responsive, interactive prototypes for the Navdila connected healthcare ecosystem and AXAIUS brand system.
 
-## Protected deployment
+## Public pages for now
 
-Both pages are served by the Cloudflare Worker defined in [`worker.js`](./worker.js). The Worker checks a Supabase Auth session before serving either page or allowing checklist API access. Unauthenticated visitors are redirected to the sign-in page.
+The repository stays private. GitHub Pages cannot publish this private repository on its current plan, so the public pages use a Cloudflare Worker with no visitor sign-in. Anyone with the links can view the pages and update shared AXAIUS checklist progress. Do not store sensitive information in the checklist.
 
-The Worker uses the existing Supabase project for sign-in and shared checklist data. It accepts email/password accounts only; there is no public sign-up form. In Supabase Authentication settings, turn off **Allow new users to sign up**, then invite the intended users.
+Configure these GitHub Actions values before deploying:
 
-Configure these GitHub repository settings before deploying:
+1. Add your Cloudflare account ID as the `CLOUDFLARE_ACCOUNT_ID` Actions variable.
+2. Add a Cloudflare API token with the **Edit Cloudflare Workers** permission as the `CLOUDFLARE_API_TOKEN` Actions secret.
+3. Run the **Deploy public prototypes to Cloudflare Workers** workflow from the GitHub Actions tab.
 
-1. Add the Cloudflare account ID as the `CLOUDFLARE_ACCOUNT_ID` Actions variable.
-2. Add a Cloudflare API token with permission to deploy Workers as the `CLOUDFLARE_API_TOKEN` Actions secret.
-3. Run [`axaius/supabase.sql`](./axaius/supabase.sql) in the Supabase SQL Editor to remove anonymous checklist access and grant it to signed-in users only.
-4. Run the **Deploy private site to Cloudflare Workers** workflow from the GitHub Actions tab.
+The workflow output provides the temporary `workers.dev` base link. Share that base URL for Navdila and append `/axaius/` for the AXAIUS checklist. Both pages are public without sign-in.
 
-The GitHub repository is private and its old public Pages site has been disabled. After deployment, the Worker URL shown in the workflow output is the protected base link. Share that base URL for Navdila and append `/axaius/` for the AXAIUS checklist. Both pages require a Supabase account.
+## Supabase checklist access
 
-## AXAIUS standalone page
+Run [`axaius/supabase.sql`](./axaius/supabase.sql) in the Supabase SQL Editor to allow public checklist reads and edits. The publishable key in [`axaius/config.js`](./axaius/config.js) is intended for browser use; access is controlled by the table's row-level security policies.
 
-The AXAIUS brand engine and interactive checklist remains separate from the Navdila prototype in `axaius/index.html`.
+## Later: private Cloudflare deployment
+
+The Worker in [`worker.js`](./worker.js) can require Supabase sign-in. When ready to make the pages private, run [`axaius/supabase-private.sql`](./axaius/supabase-private.sql) first to remove anonymous checklist access, change `REQUIRE_AUTH` to `"true"` in [`wrangler.jsonc`](./wrangler.jsonc), and run the Cloudflare deployment workflow. Configure a custom domain on the Worker when the domain is purchased.
 
 ## Local preview
 
-Open `index.html` or `axaius/index.html` directly for a visual preview. Authenticated checklist syncing is available only through the protected Worker deployment.
+Open `index.html` or `axaius/index.html` directly for a visual preview.

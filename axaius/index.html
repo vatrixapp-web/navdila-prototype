@@ -196,7 +196,7 @@
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-dark-card border border-dark-border p-4 rounded-xl">
                 <div>
                     <h2 class="text-base font-bold text-white">Deliverable Completion Hub</h2>
-                    <p class="text-xs text-slate-400">Checklist progress is shared with everyone who opens this page.</p>
+                    <p class="text-xs text-slate-400">Anyone with this page link can update shared checklist progress.</p>
                     <p id="syncStatus" class="mt-2 text-xs text-yellow-300" role="status" aria-live="polite">Connecting to shared checklist...</p>
                 </div>
                 <div class="flex items-center space-x-2">
@@ -472,6 +472,8 @@
         </div>
     </footer>
 
+    <script src="./config.js"></script>
+
     <!-- INTERACTIVE JAVASCRIPT ENGINE -->
     <script>
         // MASTER DELIVERABLES DATA MATRIX (All 26 Categories Structured into 5 Phases)
@@ -636,6 +638,9 @@
             }
         ];
 
+        const SUPABASE_URL = window.AXAIUS_SUPABASE_URL || '';
+        const SUPABASE_ANON_KEY = window.AXAIUS_SUPABASE_ANON_KEY || '';
+        const USE_PROTECTED_API = window.AXAIUS_USE_PROTECTED_API === true;
         const SUPABASE_TABLE = 'axaius_deliverables';
         const SUPABASE_POLL_INTERVAL = 5000;
         const deliverableIds = new Set(
@@ -678,12 +683,18 @@
         }
 
         async function supabaseRequest(path, options = {}) {
-            const response = await fetch(`/api/${path}`, {
+            const endpoint = USE_PROTECTED_API
+                ? `/api/${path}`
+                : `${SUPABASE_URL.replace(/\/$/, '')}/rest/v1/${path}`;
+            const headers = {
+                'Content-Type': 'application/json',
+                ...(options.prefer ? { Prefer: options.prefer } : {})
+            };
+            if (!USE_PROTECTED_API) headers.apikey = SUPABASE_ANON_KEY;
+
+            const response = await fetch(endpoint, {
                 method: options.method || 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(options.prefer ? { Prefer: options.prefer } : {})
-                },
+                headers,
                 ...(options.body ? { body: JSON.stringify(options.body) } : {})
             });
 

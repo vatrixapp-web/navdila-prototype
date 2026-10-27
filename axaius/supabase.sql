@@ -15,6 +15,15 @@ drop policy if exists "Anyone can add AXAIUS deliverables"
 drop policy if exists "Anyone can update AXAIUS deliverables"
     on public.axaius_deliverables;
 
+drop policy if exists "Public can read AXAIUS deliverables"
+    on public.axaius_deliverables;
+
+drop policy if exists "Public can add AXAIUS deliverables"
+    on public.axaius_deliverables;
+
+drop policy if exists "Public can update AXAIUS deliverables"
+    on public.axaius_deliverables;
+
 drop policy if exists "Signed-in users can read AXAIUS deliverables"
     on public.axaius_deliverables;
 
@@ -24,24 +33,24 @@ drop policy if exists "Signed-in users can add AXAIUS deliverables"
 drop policy if exists "Signed-in users can update AXAIUS deliverables"
     on public.axaius_deliverables;
 
-revoke all on public.axaius_deliverables from public, anon;
-grant select, insert, update on public.axaius_deliverables to authenticated;
+revoke all on public.axaius_deliverables from public;
+grant select, insert, update on public.axaius_deliverables to anon, authenticated;
 
-create policy "Signed-in users can read AXAIUS deliverables"
+create policy "Public can read AXAIUS deliverables"
     on public.axaius_deliverables
     for select
-    to authenticated
+    to anon, authenticated
     using (true);
 
-create policy "Signed-in users can add AXAIUS deliverables"
+create policy "Public can add AXAIUS deliverables"
     on public.axaius_deliverables
     for insert
-    to authenticated
+    to anon, authenticated
     with check (true);
 
-create policy "Signed-in users can update AXAIUS deliverables"
+create policy "Public can update AXAIUS deliverables"
     on public.axaius_deliverables
     for update
-    to authenticated
+    to anon, authenticated
     using (true)
     with check (true);
