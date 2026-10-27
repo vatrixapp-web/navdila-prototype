@@ -2,17 +2,16 @@
 
 Responsive, interactive prototypes for the Navdila connected healthcare ecosystem and AXAIUS brand system.
 
-## Public pages for now
+## Public pages
 
-The repository stays private. GitHub Pages cannot publish this private repository on its current plan, so the public pages use a Cloudflare Worker with no visitor sign-in. Anyone with the links can view the pages and update shared AXAIUS checklist progress. Do not store sensitive information in the checklist.
+The repository is public so GitHub Pages can deploy the pages without Cloudflare. Anyone can view both pages and update shared AXAIUS checklist progress. Do not store sensitive information in the checklist.
 
-Configure these GitHub Actions values before deploying:
+The pages deploy automatically when changes are pushed to `main`:
 
-1. Add your Cloudflare account ID as the `CLOUDFLARE_ACCOUNT_ID` Actions variable.
-2. Add a Cloudflare API token with the **Edit Cloudflare Workers** permission as the `CLOUDFLARE_API_TOKEN` Actions secret.
-3. Run the **Deploy public prototypes to Cloudflare Workers** workflow from the GitHub Actions tab.
+- Navdila: https://vatrixapp-web.github.io/navdila-prototype/
+- AXAIUS: https://vatrixapp-web.github.io/navdila-prototype/axaius/
 
-The workflow output provides the temporary `workers.dev` base link. Share that base URL for Navdila and append `/axaius/` for the AXAIUS checklist. Both pages are public without sign-in.
+The workflow publishes only the two HTML pages and the AXAIUS public Supabase client configuration.
 
 ## Supabase checklist access
 
@@ -20,7 +19,7 @@ Run [`axaius/supabase.sql`](./axaius/supabase.sql) in the Supabase SQL Editor to
 
 ## Later: private Cloudflare deployment
 
-The Worker in [`worker.js`](./worker.js) can require Supabase sign-in. When ready to make the pages private, run [`axaius/supabase-private.sql`](./axaius/supabase-private.sql) first to remove anonymous checklist access, change `REQUIRE_AUTH` to `"true"` in [`wrangler.jsonc`](./wrangler.jsonc), and run the Cloudflare deployment workflow. Configure a custom domain on the Worker when the domain is purchased.
+The Worker in [`worker.js`](./worker.js) can require Supabase sign-in. When ready to make the pages private, make the repository private, run [`axaius/supabase-private.sql`](./axaius/supabase-private.sql) to remove anonymous checklist access, change `REQUIRE_AUTH` to `"true"` in [`wrangler.jsonc`](./wrangler.jsonc), and deploy the Worker through Cloudflare. A Cloudflare API token and account ID will be required; configure a custom domain on the Worker when the domain is purchased.
 
 ## Local preview
 
