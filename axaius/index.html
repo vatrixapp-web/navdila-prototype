@@ -687,6 +687,11 @@
                 ...(options.body ? { body: JSON.stringify(options.body) } : {})
             });
 
+            if (response.status === 401) {
+                window.location.replace('/login');
+                throw new Error('Your sign-in session has expired. Please sign in again.');
+            }
+
             if (!response.ok) {
                 const details = await response.text();
                 throw new Error(`Supabase request failed (${response.status}): ${details || response.statusText}`);
